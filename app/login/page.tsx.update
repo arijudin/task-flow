@@ -1,0 +1,21 @@
+// Tambahkan import untuk CSRF
+import { generateCsrfToken } from "@/lib/csrf"
+import { CsrfField } from "@/components/csrf-field"
+
+export default function LoginPage() {
+  // Generate CSRF token
+  const csrfToken = generateCsrfToken()
+  
+  // Lanjutkan dengan kode yang ada...
+  
+  return (
+    <div className="flex min-h-screen flex-col">
+      {/* ... kode yang ada ... */}
+      <form className="space-y-6" action={handleSubmit}>
+        <CsrfField token={csrfToken} />
+        {/* ... form fields yang ada ... */}
+      </form>
+      {/* ... kode yang ada ... */}
+    </div>
+  )
+}

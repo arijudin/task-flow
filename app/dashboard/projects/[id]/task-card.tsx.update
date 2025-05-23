@@ -1,0 +1,176 @@
+"use client"
+
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { MoreHorizontal, Pencil, Trash, CheckCircle, Play, RotateCcw } from 'lucide-react'
+import { deleteTask, updateTaskStatus } from "@/app/actions/tasks"
+import { useMobile } from "@/hooks/use-mobile"
+
+interface TaskCardProps {
+  task: {
+    id: string
+    title: string
+    description: string | null
+    status: string
+    priority: string
+    dueDate: Date | null
+    projectId: string
+  }
+}
+
+export function TaskCard({ task }: TaskCardProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const isMobile = useMobile()
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    const result = await deleteTask(task.id)
+
+    if (result.success) {
+      setIsDeleteDialogOpen(false)
+    } else {
+      console.error("Failed to delete task:", result.errors)
+    }
+    setIsDeleting(false)
+  }
+
+  const handleStatusChange = async (status: string) => {
+    setIsUpdating(true)
+    await updateTaskStatus(task.id, status)
+    setIsUpdating(false)
+  }
+
+  const priorityColors = {
+    low: "bg-blue-100 text-blue-800",
+    medium: "bg-yellow-100 text-yellow-800",
+    high: "bg-red-100 text-red-800",
+  }
+
+  const statusColors = {
+    todo: "bg-gray-100 text-gray-800",
+    "in-progress": "bg-purple-100 text-purple-800",
+    completed: "bg-green-100 text-green-800",
+  }
+
+  return (
+    <>
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex justify-between">
+            <CardTitle className="text-base line-clamp-1">{task.title}</CardTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" disabled={isUpdating}>
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Actions</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <a href={`/dashboard/projects/${task.projectId}/tasks/${task.id}/edit`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-red-600">
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <CardDescription className="line-clamp-2">{task.description || "No description"}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className={priorityColors[task.priority as keyof typeof priorityColors]}>
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+            </Badge>
+            <Badge variant="outline" className={statusColors[task.status as keyof typeof statusColors]}>
+              {task.status === "in-progress"
+                ? "In Progress"
+                : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+            </Badge>
+            {task.dueDate && <Badge variant="outline">Due: {new Date(task.dueDate).toLocaleDateString()}</Badge>}
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          {task.status !== "completed" && (
+            <Button 
+              size={isMobile ? "icon" : "sm"} 
+              variant="outline" 
+              onClick={() => handleStatusChange("completed")} 
+              disabled={isUpdating}
+            >
+              {isMobile ? (
+                <CheckCircle className="h-4 w-4" />
+              ) : (
+                "Mark Complete"
+              )}
+            </Button>
+          )}
+          {task.status === "todo" && (
+            <Button 
+              size={isMobile ? "icon" : "sm"} 
+              variant="outline" 
+              onClick={() => handleStatusChange("in-progress")} 
+              disabled={isUpdating}
+            >
+              {isMobile ? (
+                <Play className="h-4 w-4" />
+              ) : (
+                "Start Task"
+              )}
+            </Button>
+          )}
+          {task.status === "completed" && (
+            <Button 
+              size={isMobile ? "icon" : "sm"} 
+              variant="outline" 
+              onClick={() => handleStatusChange("todo")} 
+              disabled={isUpdating}
+            >
+              {isMobile ? (
+                <RotateCcw className="h-4 w-4" />
+              ) : (
+                "Reopen Task"
+              )}
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the task. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}

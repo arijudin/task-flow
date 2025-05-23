@@ -1,0 +1,30 @@
+// Tambahkan import untuk CSRF protection
+import { verifyCsrfToken } from "@/lib/csrf"
+
+// Update fungsi signup untuk memeriksa CSRF token
+export async function signup(formData: FormData) {
+  // Verify CSRF token
+  const csrfToken = formData.get("csrf_token") as string
+  if (!verifyCsrfToken(csrfToken)) {
+    return {
+      success: false,
+      errors: { _form: ["Invalid CSRF token. Please try again."] },
+    }
+  }
+
+  // Lanjutkan dengan kode yang ada...
+}
+
+// Update fungsi login untuk memeriksa CSRF token
+export async function login(formData: FormData) {
+  // Verify CSRF token
+  const csrfToken = formData.get("csrf_token") as string
+  if (!verifyCsrfToken(csrfToken)) {
+    return {
+      success: false,
+      errors: { _form: ["Invalid CSRF token. Please try again."] },
+    }
+  }
+
+  // Lanjutkan dengan kode yang ada...
+}

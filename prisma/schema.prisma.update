@@ -1,0 +1,24 @@
+// Tambahkan model Notification
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  message     String
+  type        String    // "task_due", "task_assigned", "project_update", etc.
+  isRead      Boolean   @default(false)
+  relatedId   String?   // ID of related entity (task, project, etc.)
+  relatedType String?   // Type of related entity ("task", "project", etc.)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("notifications")
+}
+
+// Update User model to include notifications
+model User {
+  // Existing fields...
+  notifications Notification[]
+  
+  // Existing relations...
+}
