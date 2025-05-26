@@ -1,14 +1,39 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  PieChart,
+  Pie,
+  Cell,
+  CartesianGrid,
+  Label,
+} from "recharts";
 
 interface AnalyticsCardProps {
-  title: string
-  description?: string
-  type: "bar" | "pie"
-  data: any[]
-  dataKey: string
-  nameKey: string
-  colors?: string[]
+  title: string;
+  description?: string;
+  type: "bar" | "pie";
+  data: any[];
+  dataKey: string;
+  nameKey: string;
+  colors?: string[];
+  showLegend?: boolean;
 }
 
 export function AnalyticsCard({
@@ -19,7 +44,37 @@ export function AnalyticsCard({
   dataKey,
   nameKey,
   colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
+  showLegend = false,
 }: AnalyticsCardProps) {
+  // Generate config from data
+  const config = React.useMemo(() => {
+    const configObj: Record<string, { label: string; color?: string }> = {};
+    
+    if (type === "bar") {
+      configObj[dataKey] = {
+        label: title,
+        color: colors[0],
+      };
+    } else if (type === "pie") {
+      data.forEach((item, index) => {
+        configObj[item[nameKey]] = {
+          label: item[nameKey],
+          color: colors[index % colors.length],
+        };
+      });
+    }
+    
+    return configObj;
+  }, [data, dataKey, nameKey, title, type, colors]);
+
+  // Calculate total for pie chart (if applicable)
+  const total = React.useMemo(() => {
+    if (type === "pie") {
+      return data.reduce((acc, item) => acc + item[dataKey], 0);
+    }
+    return 0;
+  }, [data, dataKey, type]);
+
   return (
     <Card>
       <CardHeader>
@@ -28,38 +83,86 @@ export function AnalyticsCard({
       </CardHeader>
       <CardContent>
         <div className="h-[200px] w-full">
-          {type === "bar" ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
-                <XAxis dataKey={nameKey} tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: "white", border: "1px solid #e2e8f0", borderRadius: "6px" }} />
-                <Bar dataKey={dataKey} fill={colors[0]} radius={[4, 4, 0, 0]} />
+          <ChartContainer config={config} className="h-[200px] w-full">
+            {type === "bar" ? (
+              <BarChart data={data}>
+                <CartesianGrid vertical={false} />
+                <XAxis 
+                  dataKey={nameKey} 
+                  tickLine={false} 
+                  axisLine={false}
+                  tickMargin={10}
+                />
+                <YAxis 
+                  tickLine={false} 
+                  axisLine={false}
+                  tickMargin={10}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent />}
+                />
+                <Bar 
+                  dataKey={dataKey} 
+                  radius={[4, 4, 0, 0]}
+                />
+                {showLegend && <ChartLegend content={<ChartLegendContent />} />}
               </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
+            ) : (
               <PieChart>
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
                 <Pie
                   data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
                   dataKey={dataKey}
                   nameKey={nameKey}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={2}
+                  labelLine={false}
                 >
                   {data.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                   ))}
+                  {type === "pie" && (
+                    <Label
+                      content={({ viewBox }) => {
+                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                          return (
+                            <text
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                            >
+                              <tspan
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                className="fill-foreground text-2xl font-bold"
+                              >
+                                {total}
+                              </tspan>
+                              <tspan
+                                x={viewBox.cx}
+                                y={(viewBox.cy || 0) + 20}
+                                className="fill-muted-foreground text-xs"
+                              >
+                                Total
+                              </tspan>
+                            </text>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                  )}
                 </Pie>
-                <Tooltip contentStyle={{ background: "white", border: "1px solid #e2e8f0", borderRadius: "6px" }} />
+                {showLegend && <ChartLegend content={<ChartLegendContent nameKey={nameKey} />} />}
               </PieChart>
-            </ResponsiveContainer>
-          )}
+            )}
+          </ChartContainer>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,40 +1,57 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus } from "lucide-react"
-import { getProject } from "@/app/actions/projects"
-import { TaskCard } from "./task-card"
-import { notFound } from "next/navigation"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus } from "lucide-react";
+import { getProject } from "@/app/actions/projects";
+import { TaskCard } from "./task-card";
+import { notFound } from "next/navigation";
 
 interface ProjectPageProps {
-  params: {
-    id: string
-  }
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const project = await getProject(params.id)
+  // The error indicates that params should be awaited before using its properties,
+  // but in this case we need to ensure we're properly handling it as a promise if needed
+  const { id } = await params;
+  const project = await getProject(id);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
   // Group tasks by status
-  const todoTasks = project.tasks.filter((task) => task.status === "todo")
-  const inProgressTasks = project.tasks.filter((task) => task.status === "in-progress")
-  const completedTasks = project.tasks.filter((task) => task.status === "completed")
+  const todoTasks = project.tasks.filter((task) => task.status === "todo");
+  const inProgressTasks = project.tasks.filter(
+    (task) => task.status === "in-progress",
+  );
+  const completedTasks = project.tasks.filter(
+    (task) => task.status === "completed",
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="container py-4 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{project.name}</h1>
-          <p className="text-muted-foreground">{project.description || "No description"}</p>
+          <p className="text-muted-foreground">
+            {project.description || "No description"}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline">
-            <Link href={`/dashboard/projects/${project.id}/edit`}>Edit Project</Link>
+            <Link href={`/dashboard/projects/${project.id}/edit`}>
+              Edit Project
+            </Link>
           </Button>
           <Button asChild>
             <Link href={`/dashboard/projects/${project.id}/tasks/new`}>
@@ -127,7 +144,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.tasks.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
                   <h2 className="text-lg font-medium">No tasks yet</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Create your first task to get started.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Create your first task to get started.
+                  </p>
                   <Button asChild className="mt-4">
                     <Link href={`/dashboard/projects/${project.id}/tasks/new`}>
                       <Plus className="mr-2 h-4 w-4" />
@@ -147,5 +166,5 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
