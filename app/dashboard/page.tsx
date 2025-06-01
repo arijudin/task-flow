@@ -21,7 +21,7 @@ import {
 } from "../actions/analytics";
 // import { AnalyticsCard } from "@/components/dashboard/analytics-card";
 import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
-// import { ProductivitySummary } from "@/components/dashboard/productivity-summary";
+import { ProductivitySummary } from "@/components/dashboard/productivity-summary";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -206,9 +206,9 @@ export default async function DashboardPage() {
             </Card>
           </div>
         </TabsContent>
-        {/* <TabsContent value="analytics" className="space-y-4">
+        <TabsContent value="analytics" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <AnalyticsCard
+            {/* <AnalyticsCard
               title="Task Status Distribution"
               description="Distribution of tasks by status"
               type="pie"
@@ -227,11 +227,11 @@ export default async function DashboardPage() {
               nameKey="name"
               colors={["#3b82f6", "#f59e0b", "#ef4444"]}
               showLegend={true}
-            />
+            /> */}
             <ProductivitySummary {...productivityData} />
           </div>
           <div className="grid gap-4 md:grid-cols-1">
-            <AnalyticsCard
+            {/* <AnalyticsCard
               title="Weekly Task Completion"
               description="Number of tasks completed per week"
               type="bar"
@@ -240,9 +240,9 @@ export default async function DashboardPage() {
               nameKey="name"
               colors={["#3b82f6"]}
               showLegend={false}
-            />
+            /> */}
           </div>
-        </TabsContent> */}
+        </TabsContent>
         <TabsContent value="reports" className="space-y-4">
           <Card>
             <CardHeader>
