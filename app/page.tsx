@@ -1,6 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, CheckCircle, Clock, Users } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, CheckCircle, Clock, Users } from "lucide-react";
 
 export default function Home() {
   return (
@@ -10,16 +10,28 @@ export default function Home() {
           <span className="font-bold text-xl">TaskFlow</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            href="#"
+          >
             Features
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            href="#"
+          >
             Pricing
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            href="#"
+          >
             About
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            href="#"
+          >
             Contact
           </Link>
         </nav>
@@ -44,8 +56,8 @@ export default function Home() {
                     Manage Your Projects with Ease
                   </h1>
                   <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                    TaskFlow helps teams organize, track, and manage their work in a visual, productive, and rewarding
-                    way.
+                    TaskFlow helps teams organize, track, and manage their work
+                    in a visual, productive, and rewarding way.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -93,7 +105,9 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-                          <h4 className="text-sm font-medium mb-2">In Progress</h4>
+                          <h4 className="text-sm font-medium mb-2">
+                            In Progress
+                          </h4>
                           <div className="space-y-2">
                             <div className="bg-white p-2 rounded border dark:bg-gray-900 dark:border-gray-700">
                               <p className="text-xs">API integration</p>
@@ -104,7 +118,9 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-                          <h4 className="text-sm font-medium mb-2">Completed</h4>
+                          <h4 className="text-sm font-medium mb-2">
+                            Completed
+                          </h4>
                           <div className="space-y-2">
                             <div className="bg-white p-2 rounded border dark:bg-gray-900 dark:border-gray-700">
                               <p className="text-xs">User authentication</p>
@@ -126,7 +142,9 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Key Features</h2>
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
+                  Key Features
+                </h2>
                 <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
                   Everything you need to manage your projects efficiently
                 </p>
@@ -139,7 +157,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold">Team Collaboration</h3>
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                  Work together with your team in real-time with shared boards and tasks.
+                  Work together with your team in real-time with shared boards
+                  and tasks.
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm dark:border-gray-700">
@@ -148,7 +167,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold">Task Management</h3>
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                  Create, assign, and track tasks with customizable workflows and deadlines.
+                  Create, assign, and track tasks with customizable workflows
+                  and deadlines.
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm dark:border-gray-700">
@@ -157,7 +177,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold">Time Tracking</h3>
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                  Monitor time spent on tasks and projects to improve productivity and billing.
+                  Monitor time spent on tasks and projects to improve
+                  productivity and billing.
                 </p>
               </div>
             </div>
@@ -165,7 +186,9 @@ export default function Home() {
         </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 TaskFlow. All rights reserved.</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          © 2024 TaskFlow. All rights reserved.
+        </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="text-xs hover:underline underline-offset-4" href="#">
             Terms of Service
@@ -176,5 +199,5 @@ export default function Home() {
         </nav>
       </footer>
     </div>
-  )
+  );
 }

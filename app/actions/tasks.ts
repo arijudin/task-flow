@@ -286,3 +286,40 @@ export async function getTasks(projectId: string) {
     return []
   }
 }
+
+export async function getTask(id: string) {
+  const user = await getCurrentUser()
+
+  if (!user) {
+    return null
+  }
+
+  try {
+    const task = await prisma.task.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        project: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    })
+
+    if (!task) {
+      return null
+    }
+
+    // Check if the task belongs to the user
+    if (task.project.userId !== user.id) {
+      return null
+    }
+
+    return task
+  } catch (error) {
+    console.error("Get task error:", error)
+    return null
+  }
+}

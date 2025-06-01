@@ -1,15 +1,15 @@
-"use server"
+"use server";
 
-import { prisma } from "@/lib/prisma"
-import { getCurrentUser } from "./auth"
-import { startOfWeek, endOfWeek, subWeeks, differenceInHours } from "date-fns"
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "./auth";
+import { startOfWeek, endOfWeek, subWeeks, differenceInHours } from "date-fns";
 
 // Get task status distribution
 export async function getTaskStatusDistribution() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    return []
+    return [];
   }
 
   try {
@@ -22,35 +22,40 @@ export async function getTaskStatusDistribution() {
       select: {
         status: true,
       },
-    })
+    });
 
     // Count tasks by status
     const statusCounts = tasks.reduce(
       (acc, task) => {
-        const status = task.status
-        acc[status] = (acc[status] || 0) + 1
-        return acc
+        const status = task.status;
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
       },
       {} as Record<string, number>,
-    )
+    );
 
     // Format for chart
     return Object.entries(statusCounts).map(([status, count]) => ({
-      name: status === "todo" ? "To Do" : status === "in-progress" ? "In Progress" : "Completed",
+      name:
+        status === "todo"
+          ? "To Do"
+          : status === "in-progress"
+            ? "In Progress"
+            : "Completed",
       value: count,
-    }))
+    }));
   } catch (error) {
-    console.error("Get task status distribution error:", error)
-    return []
+    console.error("Get task status distribution error:", error);
+    return [];
   }
 }
 
 // Get task priority distribution
 export async function getTaskPriorityDistribution() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    return []
+    return [];
   }
 
   try {
@@ -63,45 +68,45 @@ export async function getTaskPriorityDistribution() {
       select: {
         priority: true,
       },
-    })
+    });
 
     // Count tasks by priority
     const priorityCounts = tasks.reduce(
       (acc, task) => {
-        const priority = task.priority
-        acc[priority] = (acc[priority] || 0) + 1
-        return acc
+        const priority = task.priority;
+        acc[priority] = (acc[priority] || 0) + 1;
+        return acc;
       },
       {} as Record<string, number>,
-    )
+    );
 
     // Format for chart
     return Object.entries(priorityCounts).map(([priority, count]) => ({
       name: priority.charAt(0).toUpperCase() + priority.slice(1),
       value: count,
-    }))
+    }));
   } catch (error) {
-    console.error("Get task priority distribution error:", error)
-    return []
+    console.error("Get task priority distribution error:", error);
+    return [];
   }
 }
 
 // Get weekly task completion
 export async function getWeeklyTaskCompletion(weeks = 4) {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    return []
+    return [];
   }
 
   try {
-    const now = new Date()
-    const result = []
+    const now = new Date();
+    const result = [];
 
     // Get data for each week
     for (let i = 0; i < weeks; i++) {
-      const endDate = i === 0 ? now : endOfWeek(subWeeks(now, i))
-      const startDate = startOfWeek(endDate)
+      const endDate = i === 0 ? now : endOfWeek(subWeeks(now, i));
+      const startDate = startOfWeek(endDate);
 
       const completedTasks = await prisma.task.count({
         where: {
@@ -114,24 +119,24 @@ export async function getWeeklyTaskCompletion(weeks = 4) {
             lte: endDate,
           },
         },
-      })
+      });
 
       result.unshift({
         name: `Week ${weeks - i}`,
         tasks: completedTasks,
-      })
+      });
     }
 
-    return result
+    return result;
   } catch (error) {
-    console.error("Get weekly task completion error:", error)
-    return []
+    console.error("Get weekly task completion error:", error);
+    return [];
   }
 }
 
 // Get productivity summary
 export async function getProductivitySummary() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
     return {
@@ -140,7 +145,7 @@ export async function getProductivitySummary() {
       tasksThisWeek: 0,
       tasksLastWeek: 0,
       averageCompletionTime: 0,
-    }
+    };
   }
 
   try {
@@ -151,7 +156,7 @@ export async function getProductivitySummary() {
           userId: user.id,
         },
       },
-    })
+    });
 
     const completedTasks = await prisma.task.count({
       where: {
@@ -160,12 +165,12 @@ export async function getProductivitySummary() {
         },
         status: "completed",
       },
-    })
+    });
 
     // Get tasks completed this week
-    const now = new Date()
-    const thisWeekStart = startOfWeek(now)
-    const thisWeekEnd = now
+    const now = new Date();
+    const thisWeekStart = startOfWeek(now);
+    const thisWeekEnd = now;
 
     const tasksThisWeek = await prisma.task.count({
       where: {
@@ -178,11 +183,11 @@ export async function getProductivitySummary() {
           lte: thisWeekEnd,
         },
       },
-    })
+    });
 
     // Get tasks completed last week
-    const lastWeekStart = startOfWeek(subWeeks(now, 1))
-    const lastWeekEnd = endOfWeek(subWeeks(now, 1))
+    const lastWeekStart = startOfWeek(subWeeks(now, 1));
+    const lastWeekEnd = endOfWeek(subWeeks(now, 1));
 
     const tasksLastWeek = await prisma.task.count({
       where: {
@@ -195,31 +200,35 @@ export async function getProductivitySummary() {
           lte: lastWeekEnd,
         },
       },
-    })
+    });
 
     // Calculate average completion time (simplified)
     // In a real app, you'd track when a task moves from "todo" to "completed"
-    let averageCompletionTime = 0
+    let averageCompletionTime = 0;
     const completedTasksWithDates = await prisma.task.findMany({
       where: {
         project: {
           userId: user.id,
         },
         status: "completed",
-        createdAt: { not: null },
-        updatedAt: { not: null },
+        createdAt: {
+          not: undefined,
+        },
+        updatedAt: {
+          not: undefined,
+        },
       },
       select: {
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     if (completedTasksWithDates.length > 0) {
       const totalHours = completedTasksWithDates.reduce((sum, task) => {
-        return sum + differenceInHours(task.updatedAt, task.createdAt)
-      }, 0)
-      averageCompletionTime = totalHours / completedTasksWithDates.length
+        return sum + differenceInHours(task.updatedAt, task.createdAt);
+      }, 0);
+      averageCompletionTime = totalHours / completedTasksWithDates.length;
     }
 
     return {
@@ -228,25 +237,25 @@ export async function getProductivitySummary() {
       tasksThisWeek,
       tasksLastWeek,
       averageCompletionTime,
-    }
+    };
   } catch (error) {
-    console.error("Get productivity summary error:", error)
+    console.error("Get productivity summary error:", error);
     return {
       completedTasks: 0,
       totalTasks: 0,
       tasksThisWeek: 0,
       tasksLastWeek: 0,
       averageCompletionTime: 0,
-    }
+    };
   }
 }
 
 // Get recent activities
 export async function getRecentActivities(limit = 10) {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    return []
+    return [];
   }
 
   try {
@@ -256,7 +265,7 @@ export async function getRecentActivities(limit = 10) {
       where: { userId: user.id },
       take: 5,
       orderBy: { updatedAt: "desc" },
-    })
+    });
 
     const tasks = await prisma.task.findMany({
       where: {
@@ -265,7 +274,7 @@ export async function getRecentActivities(limit = 10) {
       take: 5,
       orderBy: { updatedAt: "desc" },
       include: { project: true },
-    })
+    });
 
     // Generate mock activities
     const activities = [
@@ -279,18 +288,23 @@ export async function getRecentActivities(limit = 10) {
       })),
       ...tasks.map((task) => ({
         id: `task-${task.id}`,
-        type: task.status === "completed" ? ("complete_task" as const) : ("update_task" as const),
+        type:
+          task.status === "completed"
+            ? ("complete_task" as const)
+            : ("update_task" as const),
         entityName: task.title,
         timestamp: task.updatedAt,
         userId: user.id,
         userName: user.name || user.email,
       })),
-    ]
+    ];
 
     // Sort by timestamp and limit
-    return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, limit)
+    return activities
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, limit);
   } catch (error) {
-    console.error("Get recent activities error:", error)
-    return []
+    console.error("Get recent activities error:", error);
+    return [];
   }
 }
