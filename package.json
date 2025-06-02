@@ -69,7 +69,7 @@
     "path": "latest",
     "prisma": "latest",
     "react": "^19",
-    "react-day-picker": "8.10.1",
+    "react-day-picker": "^9.7.0",
     "react-dom": "^19",
     "react-hook-form": "^7.54.1",
     "react-i18next": "latest",
@@ -92,5 +92,17 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "overrides": {
+    "react": "^19",
+    "react-dom": "^19",
+    "vaul": {
+      "react": "^19",
+      "react-dom": "^19"
+    },
+    "react-day-picker": {
+      "react": "^19",
+      "react-dom": "^19"
+    }
   }
 }
